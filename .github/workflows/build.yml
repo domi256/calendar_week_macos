@@ -42,8 +42,7 @@ jobs:
       - name: Package app
         if: github.event_name != 'pull_request'
         run: |
-          cd build
-          zip -r "CalendarWeek-${{ steps.version.outputs.version }}.zip" CalendarWeek.app
+          ditto -c -k --keepParent build/CalendarWeek.app "build/CalendarWeek-${{ steps.version.outputs.version }}.zip"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
