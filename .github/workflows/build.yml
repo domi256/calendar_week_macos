@@ -40,15 +40,14 @@ jobs:
         run: bash build.sh
 
       - name: Package app
-        if: github.event_name != 'pull_request'
         run: |
-          ditto -c -k --keepParent build/CalendarWeek.app "build/CalendarWeek-${{ steps.version.outputs.version }}.zip"
+          cd build && ditto -c -k --keepParent CalendarWeek.app "CalendarWeek-${{ steps.version.outputs.version }}.zip"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: CalendarWeek-${{ steps.version.outputs.version }}
-          path: build/CalendarWeek.app
+          path: build/CalendarWeek-${{ steps.version.outputs.version }}.zip
           retention-days: 30
 
       - name: Create or update GitHub Release
