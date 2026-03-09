@@ -22,38 +22,13 @@ jobs:
         run: |
           if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
             VERSION="${GITHUB_REF#refs/tags/v}"
+            TAG="${GITHUB_REF#refs/tags/}"
           else
-            VERSION="0.0.0-dev"
+            VERSION="latest"
+            TAG="latest"
           fi
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
-
-      - name: Inject version into Info.plist
-        run: |
-          VERSION="${{ steps.version.outputs.version }}"
-          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${VERSION}" Info.plist
-          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${VERSION}" Info.plist
-
-      - name: Build
-        run: bash build.sh
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: CalendarWeek-${{ steps.version.outputs.version }}
-          path: build/CalendarWeek.app
-          retention-days: 30
-
-  release:
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: build
-    runs-on: macos-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Resolve version
-        id: version
-        run: echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
 
       - name: Inject version into Info.plist
         run: |
@@ -65,13 +40,24 @@ jobs:
         run: bash build.sh
 
       - name: Package app
+        if: github.event_name != 'pull_request'
         run: |
           cd build
           zip -r "CalendarWeek-${{ steps.version.outputs.version }}.zip" CalendarWeek.app
 
-      - name: Create GitHub Release
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CalendarWeek-${{ steps.version.outputs.version }}
+          path: build/CalendarWeek.app
+          retention-days: 30
+
+      - name: Create or update GitHub Release
+        if: github.event_name != 'pull_request'
         uses: softprops/action-gh-release@v2
         with:
-          name: "v${{ steps.version.outputs.version }}"
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: "${{ steps.version.outputs.tag == 'latest' && 'Latest build' || format('v{0}', steps.version.outputs.version) }}"
+          prerelease: ${{ steps.version.outputs.tag == 'latest' }}
           files: build/CalendarWeek-${{ steps.version.outputs.version }}.zip
-          generate_release_notes: true
+          generate_release_notes: ${{ steps.version.outputs.tag != 'latest' }}
