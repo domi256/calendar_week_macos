@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>CalendarWeek</string>
+    <key>CFBundleDisplayName</key>
+    <string>Calendar Week</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.user.calendarweek</string>
+    <key>CFBundleVersion</key>
+    <string>1.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleExecutable</key>
+    <string>CalendarWeek</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <!-- Hide from Dock and App Switcher -->
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSSupportsAutomaticTermination</key>
+    <false/>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+    <!-- Required for modern macOS -->
+    <key>NSHighResolutionCapable</key>
+    <true/>
+</dict>
+</plist>
